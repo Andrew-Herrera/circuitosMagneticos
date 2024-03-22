@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Circuitos Magnéticos</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Estilos para el diseño de una columna */
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: inline-block;
+            width: 200px; /* Ancho fijo para las etiquetas */
+            margin-right: 10px;
+            text-align: left; /* Alineación del texto a la izquierda */
+        }
+        .form-group input {
+            max-width: 150px; /* Establecemos el ancho máximo de las cajas de texto */
+            margin-right: 10px; /* Espaciado entre la caja de texto y la etiqueta de la unidad */
+        }
+        .form-group .unit-label {
+            color: #666; /* Color de texto más claro para las etiquetas de las unidades */
+            text-align: left; /* Alineación del texto a la izquierda */
+        }
+        .equation {
+            font-size: 18px;
+            font-family: 'Times New Roman', Times, serif;
+            margin-bottom: 10px;
+        }
+        .equation-variable {
+            font-style: italic;
+        }
+        .equation-sup {
+            vertical-align: super;
+            font-size: smaller;
+        }
+        .equation-sub {
+            vertical-align: sub;
+            font-size: smaller;
+        }
+        button {
+            margin-top: 10px;
+        }
+        .image {
+            margin-top: 20px;
+            max-width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+    <h2> CIRCUITOS MAGNÉTICOS </h2>
+    <form id="formularioCircuitos">
+        <div class="form-group">
+            <label for="longitudEntreHierro">Longitud del entrehierro:</label>
+            <input type="number" id="longitudEntreHierro" placeholder="Ej. 0.05" step="any" required>
+            <span class="unit-label">m</span>
+        </div>
+        
+        <div class="form-group">
+            <label for="areaSeccionTransversalEntreHierro">Área de sección transversal del entrehierro:</label>
+            <input type="number" id="areaSeccionTransversalEntreHierro" placeholder="Ej. 0.01" step="any" required>
+            <span class="unit-label">m<sup>2</sup></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="corriente">Corriente:</label>
+            <input type="number" id="corriente" placeholder="Ej. 2" step="any" required>
+            <span class="unit-label">A</span>
+        </div>
+        
+        <div class="form-group">
+            <label for="numeroVueltas">Número de vueltas:</label>
+            <input type="number" id="numeroVueltas" placeholder="Ej. 200" step="any" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="longitudFerromagnetico">Longitud del material ferromagnético:</label>
+            <input type="number" id="longitudFerromagnetico" placeholder="Ej. 1" step="any" required>
+            <span class="unit-label">m</span>
+        </div>
+        
+        <div class="form-group">
+            <h3>Introduce los siguientes coeficientes  \( B = \frac{aH}{b + cH} \)</h3>
+            
+        </div>
+        
+        <div class="form-group">
+            <label for="coeficienteA">a:</label>
+            <input type="number" id="coeficienteA" placeholder="Ej. 0.01" step="any" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="coeficienteB">b:</label>
+            <input type="number" id="coeficienteB" placeholder="Ej. 0.05" step="any" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="coeficienteC">c:</label>
+            <input type="number" id="coeficienteC" placeholder="Ej. 0.01" step="any" required>
+        </div>
+        
+        <button type="button" onclick="calcularCampoMagnetico()">Calcular Campo Magnético</button>
+    </form>
+    
+    <div id="resultado"></div>
+
+    <script>
+        function calcularCampoMagnetico() {
+            const PERMEABILIDAD_VACIO = 4 * Math.PI * 1e-7;
+            let longitudEntreHierro = parseFloat(document.getElementById('longitudEntreHierro').value);
+            let areaSeccionTransversalEntreHierro = parseFloat(document.getElementById('areaSeccionTransversalEntreHierro').value);
+            let corriente = parseFloat(document.getElementById('corriente').value);
+            let numeroVueltas = parseFloat(document.getElementById('numeroVueltas').value);
+            let longitudFerromagnetico = parseFloat(document.getElementById('longitudFerromagnetico').value);
+            let coeficienteA = parseFloat(document.getElementById('coeficienteA').value);
+            let coeficienteB = parseFloat(document.getElementById('coeficienteB').value);
+            let coeficienteC = parseFloat(document.getElementById('coeficienteC').value);
+
+            let fmm = numeroVueltas * corriente;
+            let campoMagnetico = 0.0;
+
+            while (true) {
+                campoMagnetico += 0.001;
+                let He = campoMagnetico / PERMEABILIDAD_VACIO;
+                let u23 = He * longitudEntreHierro;
+                let Hfe = (coeficienteB * campoMagnetico) / (coeficienteA - coeficienteC * campoMagnetico);
+                let ufe = Hfe * longitudFerromagnetico;
+                let Utotal = u23 + ufe;
+
+                if (fmm * 0.99 <= Utotal && Utotal <= fmm * 1.01) {
+                    break;
+                }
+            }
+        document.getElementById('resultado').innerText = `Aproximación del campo magnético es: ${campoMagnetico.toFixed(3)}`;
+        }
+    </script>
+</body>
+</html>
